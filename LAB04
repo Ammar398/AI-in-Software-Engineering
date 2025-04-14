@@ -1,0 +1,49 @@
+//Lab Task 1: Convert the program to a Three-Room Environment
+
+# three_room_environment.py
+
+from room import Room
+from environment import Environment
+from vacuum_agent import VacuumAgent
+
+class ThreeRoomVacuumCleanerEnvironment(Environment):
+    def __init__(self, agent):
+        self.rooms = {
+            'A': Room('A', 'dirty'),
+            'B': Room('B', 'dirty'),
+            'C': Room('C', 'dirty')
+        }
+        self.agent = agent
+        self.currentRoom = self.rooms['A']
+        self.delay = 1000
+        self.step = 1
+        self.action = ""
+
+    def executeStep(self, n=1):
+        for _ in range(n):
+            self.displayPerception()
+            self.agent.sense(self)
+            res = self.agent.act()
+            self.action = res
+
+            if res == 'clean':
+                self.currentRoom.status = 'clean'
+            elif res == 'right':
+                if self.currentRoom.location == 'A':
+                    self.currentRoom = self.rooms['B']
+                elif self.currentRoom.location == 'B':
+                    self.currentRoom = self.rooms['C']
+            elif res == 'left':
+                if self.currentRoom.location == 'C':
+                    self.currentRoom = self.rooms['B']
+                elif self.currentRoom.location == 'B':
+                    self.currentRoom = self.rooms['A']
+
+            self.displayAction()
+            self.step += 1
+
+    def displayPerception(self):
+        print(f"Perception at step {self.step}: [{self.currentRoom.status}, {self.currentRoom.location}]")
+
+    def displayAction(self):
+        print(f"------- Action taken at step {self.step}: [{self.action}]")
